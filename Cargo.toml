@@ -1,15 +1,15 @@
 [package]
-name = "eframe_template"
-default-run = "eframe_template_bin"
+name = "epn_gui"
+default-run = "eepn_gui_bin"
 version = "0.1.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
-edition = "2021"
+authors = ["Kamil GEritz <>"]
+edition = "2022"
 rust-version = "1.60"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "eframe_template_bin"
+name = "eepn_gui_bin"
 path = "src/main.rs"
 
 [lib]
@@ -17,9 +17,10 @@ crate-type = ["cdylib", "rlib"]
 
 
 [dependencies]
-egui = "0.18.0"
+egui = { version = "0.18.0", features = ["serde"] }
 eframe = { version = "0.18.0", features = ["persistence"] }
 serde = { version = "1", features = ["derive"] } # You only need this if you want app persistence
+serde_json = "1.0.82"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

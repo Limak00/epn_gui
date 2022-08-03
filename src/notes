@@ -1,0 +1,28 @@
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Individual {
+    pub fitness: f64,
+    pub feasible: bool,
+    pub points: Vec<Coordinate<f64>>,
+    pub evaluated: bool,
+}
+
+impl Individual {
+    pub fn new(points: Vec<Coordinate<f64>>) -> Individual {
+        Individual {
+            fitness: 1e10,
+            feasible: false,
+            points,
+            evaluated: false,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GenerationStatistic {
+    pub generation: usize,
+    pub population: Vec<Individual>,
+    pub mutation_operators_weights: Vec<f64>,
+    pub mutation_operators_uses: Vec<usize>,
+    pub crossover_operators_uses: usize,
+    pub operator_names: Vec<String>,
+}
