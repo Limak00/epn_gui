@@ -2,8 +2,8 @@
 name = "epn_gui"
 default-run = "eepn_gui_bin"
 version = "0.1.0"
-authors = ["Kamil GEritz <>"]
-edition = "2022"
+authors = ["Kamil Geritz <>"]
+edition = "2021"
 rust-version = "1.60"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

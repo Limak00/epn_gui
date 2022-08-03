@@ -11,7 +11,7 @@ pub mod podglad;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
-pub struct TemplateApp {
+pub struct Epn_Gui {
     // Example stuff:
     label: String,
     #[serde(skip)]
@@ -33,7 +33,7 @@ pub struct State {
     selected_anchor: String,
 }
 
-impl Default for TemplateApp {
+impl Default for Epn_Gui {
     fn default() -> Self {
         Self {
             // Example stuff:
@@ -52,7 +52,7 @@ impl Default for TemplateApp {
     }
 }
 
-impl TemplateApp {
+impl Epn_Gui {
     /// Called once before the first frame.
 
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
@@ -69,7 +69,7 @@ impl TemplateApp {
     }
 }
 
-impl eframe::App for TemplateApp {
+impl eframe::App for Epn_Gui {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);

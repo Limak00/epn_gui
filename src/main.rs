@@ -29,7 +29,7 @@ fn main() {
         "eframe template",
         options,
         
-        Box::new(|cc| Box::new(eframe_template::TemplateApp::new(cc))),
+        Box::new(|cc| Box::new(epn_gui::Epn_Gui::new(cc))),
         
     );
 }
