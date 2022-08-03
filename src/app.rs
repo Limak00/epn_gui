@@ -160,12 +160,12 @@ impl eframe::App for Epn_Gui {
         }
 
         if state.rysowanie {
-            painting.show(ctx, &mut true);
+            painting.show(ctx);
             
             state.ustawienia_algorytmu=true;
         }
         if state.pokolenia {
-            visualize.show(ctx, &mut true);
+            visualize.show(ctx);
             state.ustawienia_algorytmu=false;
             
         }

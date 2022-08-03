@@ -1,8 +1,9 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufReader},
 };
 
+use eframe::epaint::RectShape;
 use egui::*;
 
 use super::{Enviroment, GenerationStatistic};
@@ -25,7 +26,7 @@ impl Default for Visualize {
     fn default() -> Self {
         Self {
             individual_start: 1,
-            individual_end: 0,
+            individual_end: 1,
             pokolenie: 0,
             statistics: vec![],
             enviroment: Enviroment::default(),
@@ -43,6 +44,7 @@ impl Visualize {
             self.srodowisko.clear();
             let file = File::open("simulation_statistics.json").unwrap();
             let reader = BufReader::new(file);
+
             self.statistics =  match serde_json::from_reader(reader){
                 Ok(x) => x,
                 Err(_) => Vec::default(),
@@ -50,7 +52,11 @@ impl Visualize {
 
             let file = File::open("env.json").unwrap();
             let reader = BufReader::new(file);
-            self.enviroment = serde_json::from_reader(reader).unwrap();
+            self.enviroment =  match serde_json::from_reader(reader){
+                Ok(x) => x,
+                Err(_) => Enviroment::default(),
+            };
+            //self.enviroment = serde_json::from_reader(reader).unwrap();
 
             let height = self.enviroment.height as f32;
             let width = self.enviroment.width as f32;
@@ -82,9 +88,14 @@ impl Visualize {
         match self.statistics.first() {
             Some(x) => {
                 ui.add(
-                    egui::Slider::new(&mut self.individual_start, 1..=x.population.len() - 1)
-                        .text("ilość"),
+                    egui::Slider::new(&mut self.individual_start, 1..=self.individual_end )
+                        .text("poczatek"),
                 );
+                ui.add(
+                    egui::Slider::new(&mut self.individual_end, self.individual_start..=x.population.len() - 1)
+                        .text("koniec"),
+                );
+
             }
             None => {}
         }
@@ -103,6 +114,7 @@ impl Visualize {
 
 
         match self.statistics.first() {
+            
             Some(x) => {
                 let height = self.enviroment.height as f32;
                 let width = self.enviroment.width as f32;
@@ -116,7 +128,8 @@ impl Visualize {
                             .collect()
 
                     })
-                    .take(self.individual_start)
+                    .skip(self.individual_start)
+                    .take(self.individual_end.abs_diff(self.individual_start)+1)
                     .collect();
             }
             None => {}
@@ -146,6 +159,7 @@ impl Visualize {
                     self.stroke_kurs.width,
                     self.stroke_kurs.color.linear_multiply(1. / (1.+ (0.2 * i  as f32)),)
                 );
+                
                 shapes.push(egui::Shape::line(points, stroke));
             }
         }
@@ -156,7 +170,7 @@ impl Visualize {
 }
 
 impl Visualize {
-    pub fn show(&mut self, ctx: &Context, open: &mut bool) {
+    pub fn show(&mut self, ctx: &Context) {
         egui::CentralPanel::default().show(ctx, |ui| self.ui(ui));
         egui::SidePanel::right("Ustawienia").show(ctx, |ui| {
             self.ui_control(ui);

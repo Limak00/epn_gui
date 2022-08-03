@@ -98,7 +98,7 @@ impl Painting {
 }
 
 impl Painting {
-    pub fn show(&mut self, ctx: &Context, open: &mut bool) {
+    pub fn show(&mut self, ctx: &Context) {
         egui::CentralPanel::default().show(ctx, |ui| self.ui(ui));
     }
 }
