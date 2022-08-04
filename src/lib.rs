@@ -1,7 +1,7 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 mod app;
-pub use app::Epn_Gui;
+pub use app::EpnGui;
 
 // ----------------------------------------------------------------------------
 // When compiling for web:

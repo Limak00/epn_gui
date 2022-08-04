@@ -1,9 +1,5 @@
-use std::{
-    fs::File,
-    io::{BufReader},
-};
+use std::{fs::File, io::BufReader};
 
-use eframe::epaint::RectShape;
 use egui::*;
 
 use super::{Enviroment, GenerationStatistic};
@@ -40,19 +36,21 @@ impl Default for Visualize {
 
 impl Visualize {
     pub fn ui_control(&mut self, ui: &mut Ui) {
+        ui.separator();
+        ui.separator();
         if ui.button("wczytaj dane").clicked() {
             self.srodowisko.clear();
             let file = File::open("simulation_statistics.json").unwrap();
             let reader = BufReader::new(file);
 
-            self.statistics =  match serde_json::from_reader(reader){
+            self.statistics = match serde_json::from_reader(reader) {
                 Ok(x) => x,
                 Err(_) => Vec::default(),
             };
-
+            
             let file = File::open("env.json").unwrap();
             let reader = BufReader::new(file);
-            self.enviroment =  match serde_json::from_reader(reader){
+            self.enviroment = match serde_json::from_reader(reader) {
                 Ok(x) => x,
                 Err(_) => Enviroment::default(),
             };
@@ -87,15 +85,18 @@ impl Visualize {
         ui.label("wybierz ilosc najlepszych osobników");
         match self.statistics.first() {
             Some(x) => {
+                ui.label("wybierz ilosc najlepszych osobników");
                 ui.add(
-                    egui::Slider::new(&mut self.individual_start, 1..=self.individual_end )
+                    egui::Slider::new(&mut self.individual_start, 1..=self.individual_end)
                         .text("poczatek"),
                 );
                 ui.add(
-                    egui::Slider::new(&mut self.individual_end, self.individual_start..=x.population.len() - 1)
-                        .text("koniec"),
+                    egui::Slider::new(
+                        &mut self.individual_end,
+                        self.individual_start..=x.population.len() - 1,
+                    )
+                    .text("koniec"),
                 );
-
             }
             None => {}
         }
@@ -111,10 +112,8 @@ impl Visualize {
         );
         // let from_screen = to_screen.inverse();
 
-
-
         match self.statistics.first() {
-            
+            #[allow(unused)]
             Some(x) => {
                 let height = self.enviroment.height as f32;
                 let width = self.enviroment.width as f32;
@@ -126,25 +125,26 @@ impl Visualize {
                             .iter()
                             .map(|x| (x.x / width, (x.y / height)).into())
                             .collect()
-
                     })
                     .skip(self.individual_start)
-                    .take(self.individual_end.abs_diff(self.individual_start)+1)
+                    .take(self.individual_end.abs_diff(self.individual_start) + 1)
                     .collect();
             }
             None => {}
         }
 
         let mut shapes = vec![];
-        if ui.visuals().dark_mode
-        {
-            self.stroke=Stroke::new(self.stroke.width,Color32::from_rgb(124, 252, 0));
-            self.stroke_kurs=Stroke::new(self.stroke_kurs.width,Color32::from_rgb(255, 255, 255));
-        }else{
-            self.stroke=Stroke::new(self.stroke.width,Color32::from_rgb(255-124, 255-252, 255-0));
-            self.stroke_kurs=Stroke::new(self.stroke_kurs.width,Color32::from_rgb(0, 0, 0));
-        }
-        ;
+        if ui.visuals().dark_mode {
+            self.stroke = Stroke::new(self.stroke.width, Color32::from_rgb(124, 252, 0));
+            self.stroke_kurs =
+                Stroke::new(self.stroke_kurs.width, Color32::from_rgb(255, 255, 255));
+        } else {
+            self.stroke = Stroke::new(
+                self.stroke.width,
+                Color32::from_rgb(255 - 124, 255 - 252, 255 - 0),
+            );
+            self.stroke_kurs = Stroke::new(self.stroke_kurs.width, Color32::from_rgb(0, 0, 0));
+        };
         for line in &self.srodowisko {
             if line.len() >= 1 {
                 let points: Vec<Pos2> = line.iter().map(|p| to_screen * *p).collect();
@@ -157,11 +157,26 @@ impl Visualize {
                 let points: Vec<Pos2> = line.iter().map(|p| to_screen * *p).collect();
                 let stroke = Stroke::new(
                     self.stroke_kurs.width,
-                    self.stroke_kurs.color.linear_multiply(1. / (1.+ (0.2 * i  as f32)),)
+                    self.stroke_kurs
+                        .color
+                        .linear_multiply(1. / (1. + (0.2 * i as f32))),
                 );
-                
+
                 shapes.push(egui::Shape::line(points, stroke));
             }
+        }
+
+        //przeszkody
+        for obstacle in &self.enviroment.dynaic_obstacles {
+            let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| p.to_pos2()).collect();
+            object.push(object.first().unwrap().clone());
+            let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();
+            shapes.push(egui::Shape::circle_filled(
+                obstacle.position.to_pos2(),
+                0.05,
+                Color32::from_rgb(255, 255, 255),
+            ));
+            shapes.push(egui::Shape::line(points, self.stroke_kurs));
         }
 
         painter.extend(shapes);
