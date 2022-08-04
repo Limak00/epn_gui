@@ -39,7 +39,9 @@ impl Visualize {
         ui.separator();
         ui.separator();
         if ui.button("wczytaj dane").clicked() {
+
             self.srodowisko.clear();
+            self.statistics.clear();
             let file = File::open("simulation_statistics.json").unwrap();
             let reader = BufReader::new(file);
 
@@ -54,7 +56,6 @@ impl Visualize {
                 Ok(x) => x,
                 Err(_) => Enviroment::default(),
             };
-            //self.enviroment = serde_json::from_reader(reader).unwrap();
 
             let height = self.enviroment.height as f32;
             let width = self.enviroment.width as f32;
