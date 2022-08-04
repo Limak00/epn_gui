@@ -1,13 +1,8 @@
-use std::fmt::format;
+
 use std::fs::File;
 use std::io::BufWriter;
-use std::sync::Arc;
-
 use super::DynaicObstacle;
 use super::Enviroment;
-
-use eframe::epaint::CircleShape;
-use eframe::epaint::TextShape;
 use egui::*;
 #[derive(PartialEq, Clone, Debug)]
 enum Enum {
