@@ -64,7 +64,7 @@ impl Painting {
                 .iter()
                 .map(|x| {
                     x.iter()
-                        .map(|x| vec2(x.to_vec2().x * 1000., x.to_vec2().x * 1000.))
+                        .map(|x| vec2(x.to_vec2().x * 1000., x.to_vec2().y * 1000.))
                         .collect()
                 })
                 .collect();
