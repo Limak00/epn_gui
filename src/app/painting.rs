@@ -62,14 +62,36 @@ impl Painting {
             self.enviroment.static_obstacles = self
                 .srodowisko
                 .iter()
-                .map(|x| x.iter().map(|x| vec2(x.to_vec2().x*1000.,x.to_vec2().x*1000.)).collect())
+                .map(|x| {
+                    x.iter()
+                        .map(|x| vec2(x.to_vec2().x * 1000., x.to_vec2().x * 1000.))
+                        .collect()
+                })
                 .collect();
 
             self.enviroment
                 .dynaic_obstacles
                 .clone_from(&self.menu.obstacle);
-            self.enviroment.starting_point = vec2(self.menu.individual_start.x*1000.,self.menu.individual_start.y*1000.);
-            self.enviroment.ending_point = vec2(self.menu.individual_end.x*1000.,self.menu.individual_end.y*1000.);
+
+            self.enviroment
+                .dynaic_obstacles
+                .iter_mut()
+                .for_each(|x| x.position = vec2(x.position.x * 1000., x.position.y * 1000.));
+
+            self.enviroment.dynaic_obstacles.iter_mut().for_each(|x| {
+                x.safe_sphere
+                    .iter_mut()
+                    .for_each(|x| *x = vec2(x.x * 1000.0, x.y * 1000.))
+            });
+
+            self.enviroment.starting_point = vec2(
+                self.menu.individual_start.x * 1000.,
+                self.menu.individual_start.y * 1000.,
+            );
+            self.enviroment.ending_point = vec2(
+                self.menu.individual_end.x * 1000.,
+                self.menu.individual_end.y * 1000.,
+            );
 
             let enviroment_file = File::options()
                 .write(true)
@@ -260,7 +282,10 @@ impl Painting {
                 ))
                 .to_pos2()),
             Align2::LEFT_TOP,
-            format!("P. Poczatkowy\nX:{:.3} Y:{:.3}",self.menu.individual_start.x,self.menu.individual_start.y),
+            format!(
+                "P. Poczatkowy\nX:{:.3} Y:{:.3}",
+                self.menu.individual_start.x, self.menu.individual_start.y
+            ),
             FontId::new(12., FontFamily::Monospace),
             Color32::from_rgb(0, 255, 255),
         ));
@@ -274,7 +299,10 @@ impl Painting {
                 ))
                 .to_pos2()),
             Align2::LEFT_TOP,
-            format!("P. Koncowy\nX:{:.3} Y:{:.3}",self.menu.individual_end.x,self.menu.individual_end.y),
+            format!(
+                "P. Koncowy\nX:{:.3} Y:{:.3}",
+                self.menu.individual_end.x, self.menu.individual_end.y
+            ),
             FontId::new(12., FontFamily::Monospace),
             Color32::from_rgb(255, 0, 255),
         ));
@@ -296,19 +324,13 @@ impl Painting {
             ));
             shapes.push(egui::Shape::text(
                 &ui.fonts(),
-                to_screen
-                    * ((vec2(
-                        obstacle.position.x,
-                        obstacle.position.y+0.02,
-                    ))
-                    .to_pos2()),
+                to_screen * ((vec2(obstacle.position.x, obstacle.position.y + 0.02)).to_pos2()),
                 Align2::CENTER_BOTTOM,
-                format!("X:{:.3} Y:{:.3}",obstacle.position.x,obstacle.position.y),
+                format!("X:{:.3} Y:{:.3}", obstacle.position.x, obstacle.position.y),
                 FontId::new(8., FontFamily::Monospace),
                 Color32::from_rgb(0, 255, 255),
             ));
-            
-            
+
             shapes.push(egui::Shape::line(points, self.stroke_kurs));
         }
 
