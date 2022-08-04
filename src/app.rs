@@ -1,5 +1,9 @@
 
-use egui::Vec2;
+use std::f32::consts::PI;
+use std::fs::File;
+use std::io::BufWriter;
+
+use egui::{Vec2, vec2, Pos2};
 use serde::{Serialize, Deserialize};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
@@ -11,7 +15,7 @@ pub mod podglad;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
-pub struct Epn_Gui {
+pub struct EpnGui {
     // Example stuff:
     label: String,
     #[serde(skip)]
@@ -33,7 +37,7 @@ pub struct State {
     selected_anchor: String,
 }
 
-impl Default for Epn_Gui {
+impl Default for EpnGui {
     fn default() -> Self {
         Self {
             // Example stuff:
@@ -52,9 +56,9 @@ impl Default for Epn_Gui {
     }
 }
 
-impl Epn_Gui {
+impl EpnGui {
     /// Called once before the first frame.
-
+    #[allow(unused)]
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customized the look at feel of egui using
         // `cc.egui_ctx.set_visuals`ctx.set_fonts`.
@@ -67,9 +71,10 @@ impl Epn_Gui {
 
         Default::default()
     }
+
 }
 
-impl eframe::App for Epn_Gui {
+impl eframe::App for EpnGui {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
@@ -88,9 +93,9 @@ impl eframe::App for Epn_Gui {
         // The top panel is often a good place for a menu bar:
 
         // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
+        // PIck whichever suits you.
         // Tip: a good default choice is to just keep the `CentralPanel`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
+        // For insPIration and more examples, go to https://emilk.github.io/egui
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -106,8 +111,8 @@ impl eframe::App for Epn_Gui {
 
                     for (name, anchor) in [
                         ("Rysowanie", &mut state.rysowanie),
-                        ("tri", &mut state.tri),
                         ("wizualizacja", &mut state.pokolenia),
+                        ("tri", &mut state.tri),
                     ] {
                         if ui.selectable_label(selected_anchor == name, name).clicked() {
                             selected_anchor = name.to_owned();
@@ -116,8 +121,6 @@ impl eframe::App for Epn_Gui {
                         if selected_anchor !=name{
                             *anchor=false;
                         }
-
-
                     }
                     state.selected_anchor = selected_anchor;
                 });
@@ -144,29 +147,15 @@ impl eframe::App for Epn_Gui {
                     *value += 1.0;
                 }
 
-                ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                    ui.horizontal(|ui| {
-                        ui.spacing_mut().item_spacing.x = 0.0;
-                        ui.label("powered by ");
-                        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                        ui.label(" and ");
-                        ui.hyperlink_to(
-                            "eframe",
-                            "https://github.com/emilk/egui/tree/master/eframe",
-                        );
-                    });
-                });
             });
         }
 
         if state.rysowanie {
             painting.show(ctx);
             
-            state.ustawienia_algorytmu=true;
         }
         if state.pokolenia {
             visualize.show(ctx);
-            state.ustawienia_algorytmu=false;
             
         }
 
@@ -233,4 +222,62 @@ pub struct Enviroment {
     pub starting_point: Vec2,
     pub ending_point: Vec2,
     pub static_obstacles: Vec<Vec<Vec2>>,
+    pub dynaic_obstacles: Vec<DynaicObstacle>,
+
+}
+#[derive(Clone, Debug, Deserialize, Serialize, Default)]
+pub struct DynaicObstacle{
+    pub position: Vec2,
+    pub course :f32,
+    pub speed :f32,
+    pub safe_sphere: Vec<Vec2>,
+
+}
+
+impl DynaicObstacle {
+    pub fn new(position: Vec2, course:f32,speed:f32 ) -> Self{
+
+        
+        let mut safe_sphere=vec![];
+        let mut xx :f32;
+        let mut yy:f32;
+        let x=position.x*100.0;
+        let y=position.y*100.0;
+        let d:f32=2.0;
+        let co:f32 = course * PI / 180.0;
+        safe_sphere.clear();
+
+        xx = x + d * (-co).sin();
+        yy = y + d * (co + PI).cos();
+        safe_sphere.push(vec2(xx,yy));
+
+        xx =x + d * (co + PI / 2.0).sin();
+        yy =y + d * (co + PI / 2.0).cos();
+        safe_sphere.push(vec2(xx,yy));
+
+        xx = x + (4.47214) * (co + 26.565 * PI / 180.0).sin();
+        yy = y +(4.47214) * (co + 26.565 * PI / 180.0).cos();
+        safe_sphere.push(vec2(xx,yy));
+
+        xx = x + 3.0 * d * (co).sin();
+        yy = y + 3.0 * d * (co).cos();
+        safe_sphere.push(vec2(xx,yy));
+
+        xx = x + (5.65685) * (co + 315.0 * PI / 180.0).sin();
+        yy = y + (5.65685) * (co + 315.0 * PI / 180.0).cos();
+        safe_sphere.push(vec2(xx,yy));
+
+        xx = x + d * d * (co - PI / 2.0).sin();
+        yy = y + d * d * (-co + PI / 2.0).cos();
+        safe_sphere.push(vec2(xx,yy));
+
+        safe_sphere=safe_sphere.iter().map(|x| vec2(x.x/100.0,x.y/100.0)).collect();
+
+        Self{
+            position,
+            course,
+            speed,
+            safe_sphere,
+        }
+    }
 }
