@@ -1,10 +1,13 @@
+use std::fmt::format;
 use std::fs::File;
 use std::io::BufWriter;
+use std::sync::Arc;
 
 use super::DynaicObstacle;
 use super::Enviroment;
 
 use eframe::epaint::CircleShape;
+use eframe::epaint::TextShape;
 use egui::*;
 #[derive(PartialEq, Clone, Debug)]
 enum Enum {
@@ -59,23 +62,23 @@ impl Painting {
             self.enviroment.static_obstacles = self
                 .srodowisko
                 .iter()
-                .map(|x| x.iter().map(|x| x.to_vec2()).collect())
+                .map(|x| x.iter().map(|x| vec2(x.to_vec2().x*1000.,x.to_vec2().x*1000.)).collect())
                 .collect();
-
 
             self.enviroment
                 .dynaic_obstacles
                 .clone_from(&self.menu.obstacle);
-                self.enviroment.starting_point = self.menu.individual_start;
-                self.enviroment.ending_point = self.menu.individual_end;
+            self.enviroment.starting_point = vec2(self.menu.individual_start.x*1000.,self.menu.individual_start.y*1000.);
+            self.enviroment.ending_point = vec2(self.menu.individual_end.x*1000.,self.menu.individual_end.y*1000.);
 
-
-        let enviroment_file = File::options().write(true).create(true).truncate(true).open("env2.json").unwrap();
-        let writer = BufWriter::new(enviroment_file);
-        
-        serde_json::to_writer(writer, &self.enviroment);
-
-
+            let enviroment_file = File::options()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open("env2.json")
+                .unwrap();
+            let writer = BufWriter::new(enviroment_file);
+            serde_json::to_writer(writer, &self.enviroment).unwrap();
         }
 
         ui.separator();
@@ -239,24 +242,42 @@ impl Painting {
         let mut shapes = vec![];
 
         shapes.push(egui::Shape::circle_filled(
-            self.menu.individual_start.to_pos2(),
-            100.0,
+            to_screen * self.menu.individual_start.to_pos2(),
+            3.0,
             Color32::from_rgb(0, 255, 255),
         ));
         shapes.push(egui::Shape::circle_filled(
-            self.menu.individual_end.to_pos2(),
-            100.0,
+            to_screen * self.menu.individual_end.to_pos2(),
+            3.0,
+            Color32::from_rgb(255, 0, 255),
+        ));
+        shapes.push(egui::Shape::text(
+            &ui.fonts(),
+            to_screen
+                * ((vec2(
+                    self.menu.individual_start.x + 0.01,
+                    self.menu.individual_start.y,
+                ))
+                .to_pos2()),
+            Align2::LEFT_TOP,
+            format!("P. Poczatkowy\nX:{:.3} Y:{:.3}",self.menu.individual_start.x,self.menu.individual_start.y),
+            FontId::new(12., FontFamily::Monospace),
             Color32::from_rgb(0, 255, 255),
         ));
-        shapes.push(egui::Shape::Circle(CircleShape::filled(
-            self.menu.individual_end.to_pos2(),
-            0.1,
-            Color32::from_rgb(0, 255, 255),
-        )));
-        let mut points: Vec<Pos2> = vec![];
-        points.push(self.menu.individual_end.to_pos2());
-        points.push(self.menu.individual_start.to_pos2());
-        shapes.push(egui::Shape::line(points, self.stroke));
+
+        shapes.push(egui::Shape::text(
+            &ui.fonts(),
+            to_screen
+                * ((vec2(
+                    self.menu.individual_end.x + 0.01,
+                    self.menu.individual_end.y,
+                ))
+                .to_pos2()),
+            Align2::LEFT_TOP,
+            format!("P. Koncowy\nX:{:.3} Y:{:.3}",self.menu.individual_end.x,self.menu.individual_end.y),
+            FontId::new(12., FontFamily::Monospace),
+            Color32::from_rgb(255, 0, 255),
+        ));
 
         for line in &self.srodowisko {
             if line.len() >= 1 {
@@ -269,10 +290,25 @@ impl Painting {
             object.push(object.first().unwrap().clone());
             let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();
             shapes.push(egui::Shape::circle_filled(
-                obstacle.position.to_pos2(),
-                0.05,
+                to_screen * obstacle.position.to_pos2(),
+                1.0,
                 Color32::from_rgb(255, 255, 255),
             ));
+            shapes.push(egui::Shape::text(
+                &ui.fonts(),
+                to_screen
+                    * ((vec2(
+                        obstacle.position.x,
+                        obstacle.position.y+0.02,
+                    ))
+                    .to_pos2()),
+                Align2::CENTER_BOTTOM,
+                format!("X:{:.3} Y:{:.3}",obstacle.position.x,obstacle.position.y),
+                FontId::new(8., FontFamily::Monospace),
+                Color32::from_rgb(0, 255, 255),
+            ));
+            
+            
             shapes.push(egui::Shape::line(points, self.stroke_kurs));
         }
 
