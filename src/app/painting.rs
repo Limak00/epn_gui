@@ -69,6 +69,8 @@ impl Painting {
                 })
                 .collect();
 
+                self.enviroment.height=1000.0;
+                self.enviroment.width=1000.0;
             self.enviroment
                 .dynaic_obstacles
                 .clone_from(&self.menu.obstacle);
