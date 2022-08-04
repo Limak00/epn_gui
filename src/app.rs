@@ -1,9 +1,9 @@
 
 use std::f32::consts::PI;
-use std::fs::File;
-use std::io::BufWriter;
 
-use egui::{Vec2, vec2, Pos2};
+
+
+use egui::{Vec2, vec2};
 use serde::{Serialize, Deserialize};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.

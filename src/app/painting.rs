@@ -8,10 +8,10 @@ use eframe::epaint::CircleShape;
 use egui::*;
 #[derive(PartialEq, Clone, Debug)]
 enum Enum {
-    start,
-    end,
-    dym,
-    stat,
+    Start,
+    End,
+    Dym,
+    Stat,
 }
 
 #[derive(Clone, Debug)]
@@ -40,7 +40,7 @@ pub struct Menu {
 impl Default for Painting {
     fn default() -> Self {
         Self {
-            my_enum: Enum::stat,
+            my_enum: Enum::Stat,
             menu: Menu::default(),
             enviroment: Enviroment::default(),
             srodowisko: Default::default(),
@@ -72,6 +72,7 @@ impl Painting {
 
         let enviroment_file = File::options().write(true).create(true).truncate(true).open("env2.json").unwrap();
         let writer = BufWriter::new(enviroment_file);
+        
         serde_json::to_writer(writer, &self.enviroment);
 
 
@@ -81,14 +82,14 @@ impl Painting {
         ui.label("wybierz punkt początkowy");
         if ui
             .add(egui::RadioButton::new(
-                self.my_enum == Enum::start,
+                self.my_enum == Enum::Start,
                 "Dodawanie punktu starowego",
             ))
             .clicked()
         {
-            self.my_enum = Enum::start
+            self.my_enum = Enum::Start
         }
-        if self.my_enum == Enum::start {
+        if self.my_enum == Enum::Start {
             ui.add(
                 egui::Slider::new(&mut self.menu.individual_start.x, 0.0..=1.0).text("Pozycja X"),
             );
@@ -103,14 +104,14 @@ impl Painting {
         ui.label("wybierz punkt koncowy");
         if ui
             .add(egui::RadioButton::new(
-                self.my_enum == Enum::end,
+                self.my_enum == Enum::End,
                 "Dodawanie punktu koncowego",
             ))
             .clicked()
         {
-            self.my_enum = Enum::end
+            self.my_enum = Enum::End
         }
-        if self.my_enum == Enum::end {
+        if self.my_enum == Enum::End {
             ui.add(egui::Slider::new(&mut self.menu.individual_end.x, 0.0..=1.0).text("Pozycja X"));
             ui.add(egui::Slider::new(&mut self.menu.individual_end.y, 0.0..=1.0).text("Pozycja Y"));
             if ui.button("wybierz punkt koncowy").clicked() {
@@ -122,15 +123,15 @@ impl Painting {
         ui.label("obiekty dynamiczne");
         if ui
             .add(egui::RadioButton::new(
-                self.my_enum == Enum::dym,
+                self.my_enum == Enum::Dym,
                 "Dodawanie obiektu dynamicznengo",
             ))
             .clicked()
         {
-            self.my_enum = Enum::dym;
+            self.my_enum = Enum::Dym;
         }
 
-        if self.my_enum == Enum::dym {
+        if self.my_enum == Enum::Dym {
             ui.add(egui::Slider::new(&mut self.menu.obstacle_course, 0.0..=359.0).text("Kurs"));
             ui.add(egui::Slider::new(&mut self.menu.obstacle_speed, 0.0..=10.0).text("Predkosc"));
             ui.add(egui::Slider::new(&mut self.menu.obstacle_pos.x, 0.0..=1.0).text("Pozycja X"));
@@ -156,17 +157,17 @@ impl Painting {
         }
 
         ui.separator();
-        ui.label("obiekty statyczne");
+        ui.label("obiekty Statyczne");
         if ui
             .add(egui::RadioButton::new(
-                self.my_enum == Enum::stat,
+                self.my_enum == Enum::Stat,
                 "Dodawanie obiektu Statycznego",
             ))
             .clicked()
         {
-            self.my_enum = Enum::stat;
+            self.my_enum = Enum::Stat;
         }
-        if self.my_enum == Enum::stat {
+        if self.my_enum == Enum::Stat {
             ui.label(" LPM Lewy przycisk myszy aby zaznaczyczac kolejne punkty");
             ui.label(" RPM prawy przycisk myszy aby zakonczyc rysowanie figury");
         }
@@ -187,7 +188,7 @@ impl Painting {
 
         //inputy
 
-        if self.my_enum == Enum::start {
+        if self.my_enum == Enum::Start {
             if response.clicked_by(PointerButton::Primary) {
                 if let Some(pointer_pos) = response.interact_pointer_pos() {
                     let canvas_pos = from_screen * pointer_pos;
@@ -195,7 +196,7 @@ impl Painting {
                 }
             }
         }
-        if self.my_enum == Enum::end {
+        if self.my_enum == Enum::End {
             if response.clicked_by(PointerButton::Primary) {
                 if let Some(pointer_pos) = response.interact_pointer_pos() {
                     let canvas_pos = from_screen * pointer_pos;
@@ -203,7 +204,7 @@ impl Painting {
                 }
             }
         }
-        if self.my_enum == Enum::dym {
+        if self.my_enum == Enum::Dym {
             if response.clicked_by(PointerButton::Primary) {
                 if let Some(pointer_pos) = response.interact_pointer_pos() {
                     let canvas_pos = from_screen * pointer_pos;
@@ -211,7 +212,7 @@ impl Painting {
                 }
             }
         }
-        if self.my_enum == Enum::stat {
+        if self.my_enum == Enum::Stat {
             let current_line = self.srodowisko.last_mut().unwrap();
             if response.clicked_by(PointerButton::Primary) {
                 if let Some(pointer_pos) = response.interact_pointer_pos() {
