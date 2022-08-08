@@ -1,9 +1,8 @@
-
-use std::fs::File;
-use std::io::BufWriter;
 use super::DynaicObstacle;
 use super::Enviroment;
 use egui::*;
+use std::fs::File;
+use std::io::BufWriter;
 #[derive(PartialEq, Clone, Debug)]
 enum Enum {
     Start,
@@ -64,8 +63,8 @@ impl Painting {
                 })
                 .collect();
 
-                self.enviroment.height=1000.0;
-                self.enviroment.width=1000.0;
+            self.enviroment.height = 1000.0;
+            self.enviroment.width = 1000.0;
             self.enviroment
                 .dynaic_obstacles
                 .clone_from(&self.menu.obstacle);
@@ -165,6 +164,7 @@ impl Painting {
                     self.menu.obstacle_course,
                     self.menu.obstacle_speed,
                 ));
+
                 // self.enviroment
                 //     .dynaic_obstacles
                 //     .push(DynaicObstacle::new(vec2(0.5, 0.5), 0.0, 0.1));
@@ -175,6 +175,9 @@ impl Painting {
                 //     }
                 //     None => {}
                 // }
+            }
+            if ui.button("Usuń ostatni obiek dynamiczny").clicked() {
+                self.menu.obstacle.pop();
             }
         }
 
@@ -190,6 +193,12 @@ impl Painting {
             self.my_enum = Enum::Stat;
         }
         if self.my_enum == Enum::Stat {
+            if ui.button("Usuń ostatni obiek statyczny").clicked() {
+                self.srodowisko.pop();
+                self.srodowisko.pop();
+                self.srodowisko.push(vec![]);
+            }
+
             ui.label(" LPM Lewy przycisk myszy aby zaznaczyczac kolejne punkty");
             ui.label(" RPM prawy przycisk myszy aby zakonczyc rysowanie figury");
         }
