@@ -30,10 +30,10 @@ pub struct EpnGui {
 }
 
 pub struct State {
-    ustawienia_algorytmu: bool,
+    //ustawienia_algorytmu: bool,
     rysowanie: bool,
     pokolenia: bool,
-    tri: bool,
+    //tri: bool,
     selected_anchor: String,
 }
 
@@ -42,10 +42,10 @@ impl Default for EpnGui {
         Self {
             // Example stuff:
             state: State {
-                ustawienia_algorytmu: (true),
+                //ustawienia_algorytmu: (true),
                 rysowanie: (true),
                 pokolenia: (false),
-                tri: (false),
+                //tri: (false),
                 selected_anchor: ("Rysowanie").to_string(),
             },
             label: "Hello World!".to_owned(),
@@ -102,7 +102,7 @@ impl eframe::App for EpnGui {
 
             ui.horizontal_wrapped(|ui| {
                 egui::widgets::global_dark_light_mode_switch(ui);
-                ui.toggle_value(&mut state.ustawienia_algorytmu, "Ustawienia algorytmu");
+                //ui.toggle_value(&mut state.ustawienia_algorytmu, "Ustawienia algorytmu");
 
                 ui.separator();
 
@@ -112,7 +112,7 @@ impl eframe::App for EpnGui {
                     for (name, anchor) in [
                         ("Rysowanie", &mut state.rysowanie),
                         ("wizualizacja", &mut state.pokolenia),
-                        ("tri", &mut state.tri),
+                        //("tri", &mut state.tri),
                     ] {
                         if ui.selectable_label(selected_anchor == name, name).clicked() {
                             selected_anchor = name.to_owned();
@@ -133,23 +133,23 @@ impl eframe::App for EpnGui {
             });
         });
 
-        if state.ustawienia_algorytmu {
-            egui::SidePanel::left("ustawienia_algorytmu").show(ctx, |ui| {
-                ui.heading("Ustawienia_algorytmu");
-
-                ui.horizontal(|ui| {
-                    ui.label("Write something: ");
-                    ui.text_edit_singleline(label);
-                });
-
-                ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-                if ui.button("Increment").clicked() {
-                    *value += 1.0;
-                }
-
-            });
-        }
-
+      //  if state.ustawienia_algorytmu {
+      //      egui::SidePanel::left("ustawienia_algorytmu").show(ctx, |ui| {
+      //          ui.heading("Ustawienia_algorytmu");
+//
+      //          ui.horizontal(|ui| {
+      //              ui.label("Write something: ");
+      //              ui.text_edit_singleline(label);
+      //          });
+//
+      //          ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
+      //          if ui.button("Increment").clicked() {
+      //              *value += 1.0;
+      //          }
+//
+      //      });
+      //  }
+//
         if state.rysowanie {
             painting.show(ctx);
             
