@@ -66,15 +66,15 @@ impl Painting {
             self.enviroment.height = 1000.0;
             self.enviroment.width = 1000.0;
             self.enviroment
-                .dynaic_obstacles
+                .dynamic_obstacles
                 .clone_from(&self.menu.obstacle);
 
             self.enviroment
-                .dynaic_obstacles
+                .dynamic_obstacles
                 .iter_mut()
                 .for_each(|x| x.position = vec2(x.position.x * 1000., x.position.y * 1000.));
 
-            self.enviroment.dynaic_obstacles.iter_mut().for_each(|x| {
+            self.enviroment.dynamic_obstacles.iter_mut().for_each(|x| {
                 x.safe_sphere
                     .iter_mut()
                     .for_each(|x| *x = vec2(x.x * 1000.0, x.y * 1000.))

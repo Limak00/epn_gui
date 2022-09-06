@@ -168,7 +168,7 @@ impl Visualize {
         }
 
         //przeszkody
-        for obstacle in &self.enviroment.dynaic_obstacles {
+        for obstacle in &self.enviroment.dynamic_obstacles {
             let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| p.to_pos2()).collect();
             object.push(object.first().unwrap().clone());
             let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();

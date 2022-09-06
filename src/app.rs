@@ -222,7 +222,7 @@ pub struct Enviroment {
     pub starting_point: Vec2,
     pub ending_point: Vec2,
     pub static_obstacles: Vec<Vec<Vec2>>,
-    pub dynaic_obstacles: Vec<DynaicObstacle>,
+    pub dynamic_obstacles: Vec<DynaicObstacle>,
 
 }
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
