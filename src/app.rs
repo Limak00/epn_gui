@@ -213,7 +213,7 @@ pub struct GenerationStatistic {
     pub mutation_operators_weights: Vec<f64>,
     pub mutation_operators_uses: Vec<usize>,
     pub crossover_operators_uses: usize,
-    pub operator_names: Vec<String>,
+
 }
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct Enviroment {

@@ -192,12 +192,18 @@ impl Visualize {
         // }
         ////
         shapes.push(egui::Shape::circle_filled(
-            to_screen * self.enviroment.starting_point.to_pos2(),
+            to_screen * vec2(
+                self.enviroment.starting_point.x/self.enviroment.width as f32 ,
+                self.enviroment.starting_point.y/self.enviroment.height as f32,
+            ).to_pos2(),
             3.0,
             Color32::from_rgb(0, 255, 255),
         ));
         shapes.push(egui::Shape::circle_filled(
-            to_screen * self.enviroment.ending_point.to_pos2(),
+            to_screen * vec2(
+                self.enviroment.ending_point.x/self.enviroment.width as f32 ,
+                self.enviroment.ending_point.y/self.enviroment.height as f32 ,
+            ).to_pos2(),
             3.0,
             Color32::from_rgb(255, 0, 255),
         ));
@@ -205,8 +211,8 @@ impl Visualize {
             &ui.fonts(),
             to_screen
                 * ((vec2(
-                    self.enviroment.starting_point.x + 0.01,
-                    self.enviroment.starting_point.y,
+                    self.enviroment.starting_point.x/self.enviroment.width as f32 + 0.01,
+                    self.enviroment.starting_point.y/self.enviroment.height as f32,
                 ))
                 .to_pos2()),
             Align2::LEFT_TOP,
@@ -222,8 +228,8 @@ impl Visualize {
             &ui.fonts(),
             to_screen
                 * ((vec2(
-                    self.enviroment.ending_point.x + 0.01,
-                    self.enviroment.ending_point.y,
+                    self.enviroment.ending_point.x/self.enviroment.width as f32  + 0.01,
+                    self.enviroment.ending_point.y/self.enviroment.height as f32 ,
                 ))
                 .to_pos2()),
             Align2::LEFT_TOP,
@@ -234,18 +240,20 @@ impl Visualize {
             FontId::new(12., FontFamily::Monospace),
             Color32::from_rgb(255, 0, 255),
         ));
+
+
 for obstacle in &self.enviroment.dynamic_obstacles {
-    let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| p.to_pos2()).collect();
+    let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| vec2(p.x/self.enviroment.width as f32, p.y/self.enviroment.height as f32 ).to_pos2()).collect();
     object.push(object.first().unwrap().clone());
     let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();
     shapes.push(egui::Shape::circle_filled(
-        to_screen * obstacle.position.to_pos2(),
+        to_screen * vec2(obstacle.position.x/self.enviroment.width as f32, obstacle.position.y/self.enviroment.height as f32 ).to_pos2(),
         1.0,
         Color32::from_rgb(255, 255, 255),
     ));
     shapes.push(egui::Shape::text(
         &ui.fonts(),
-        to_screen * ((vec2(obstacle.position.x, obstacle.position.y + 0.02)).to_pos2()),
+        to_screen * ((vec2(obstacle.position.x/self.enviroment.width as f32, obstacle.position.y/self.enviroment.height as f32 + 0.02)).to_pos2()),
         Align2::CENTER_BOTTOM,
         format!("X:{:.3} Y:{:.3}", obstacle.position.x, obstacle.position.y),
         FontId::new(8., FontFamily::Monospace),
