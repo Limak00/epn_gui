@@ -7,6 +7,9 @@ use super::{Enviroment, GenerationStatistic};
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(default))]
 pub struct Visualize {
+    file_statistics: String,
+    file_srodowisko: String,
+
     pub srodowisko: Vec<Vec<Pos2>>,
     pub kurs: Vec<Vec<Pos2>>,
     stroke: Stroke,
@@ -21,6 +24,8 @@ pub struct Visualize {
 impl Default for Visualize {
     fn default() -> Self {
         Self {
+            file_statistics: "simulation_statistics".to_owned(),
+            file_srodowisko: "env".to_owned(),
             individual_start: 1,
             individual_end: 1,
             pokolenie: 0,
@@ -38,11 +43,17 @@ impl Visualize {
     pub fn ui_control(&mut self, ui: &mut Ui) {
         ui.separator();
         ui.separator();
+        ui.label("Plik srodowiska: ");
+        ui.text_edit_singleline(&mut self.file_srodowisko);
+        ui.label("Plik statystyk: ");
+        ui.text_edit_singleline(&mut self.file_statistics);
+
+
         if ui.button("wczytaj dane").clicked() {
 
             self.srodowisko.clear();
             self.statistics.clear();
-            let file = File::open("simulation_statistics.json").unwrap();
+            let file = File::open(self.file_statistics.to_owned()+".json").unwrap();
             let reader = BufReader::new(file);
 
             self.statistics = match serde_json::from_reader(reader) {
@@ -50,7 +61,7 @@ impl Visualize {
                 Err(_) => Vec::default(),
             };
             
-            let file = File::open("env.json").unwrap();
+            let file = File::open(self.file_srodowisko.to_owned()+".json").unwrap();
             let reader = BufReader::new(file);
             self.enviroment = match serde_json::from_reader(reader) {
                 Ok(x) => x,

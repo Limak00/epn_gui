@@ -15,6 +15,7 @@ enum Enum {
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(default))]
 pub struct Painting {
+    file_name: String,
     /// in 0-1 normalized coordinates
     pub srodowisko: Vec<Vec<Pos2>>,
     pub kurs: Vec<Vec<Pos2>>,
@@ -37,6 +38,7 @@ pub struct Menu {
 impl Default for Painting {
     fn default() -> Self {
         Self {
+            file_name: "env".to_owned(),
             my_enum: Enum::Stat,
             menu: Menu::default(),
             enviroment: Enviroment::default(),
@@ -51,6 +53,7 @@ impl Default for Painting {
 impl Painting {
     pub fn ui_control(&mut self, ui: &mut egui::Ui) {
         ui.separator();
+
         ui.separator();
         if ui.button("zapisz do pliku").clicked() {
             self.enviroment.static_obstacles = self
@@ -93,12 +96,14 @@ impl Painting {
                 .write(true)
                 .create(true)
                 .truncate(true)
-                .open("env2.json")
+                .open(self.file_name.to_owned()+".json")
                 .unwrap();
             let writer = BufWriter::new(enviroment_file);
             serde_json::to_writer(writer, &self.enviroment).unwrap();
         }
 
+
+        ui.text_edit_singleline(&mut self.file_name);
         ui.separator();
         ui.label("wybierz punkt początkowy");
         if ui
