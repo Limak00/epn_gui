@@ -17,8 +17,8 @@ pub struct Visualize {
     enviroment: Enviroment,
     statistics: Vec<GenerationStatistic>,
     pokolenie: usize,
-    individual_start: usize,
-    individual_end: usize,
+    starting_point: usize,
+    ending_point: usize,
 }
 
 impl Default for Visualize {
@@ -26,8 +26,8 @@ impl Default for Visualize {
         Self {
             file_statistics: "simulation_statistics".to_owned(),
             file_srodowisko: "env".to_owned(),
-            individual_start: 1,
-            individual_end: 1,
+            starting_point: 1,
+            ending_point: 1,
             pokolenie: 0,
             statistics: vec![],
             enviroment: Enviroment::default(),
@@ -99,13 +99,13 @@ impl Visualize {
             Some(x) => {
                 ui.label("wybierz ilosc najlepszych osobników");
                 ui.add(
-                    egui::Slider::new(&mut self.individual_start, 1..=self.individual_end)
+                    egui::Slider::new(&mut self.starting_point, 1..=self.ending_point)
                         .text("poczatek"),
                 );
                 ui.add(
                     egui::Slider::new(
-                        &mut self.individual_end,
-                        self.individual_start..=x.population.len() - 1,
+                        &mut self.ending_point,
+                        self.starting_point..=x.population.len() - 1,
                     )
                     .text("koniec"),
                 );
@@ -138,8 +138,8 @@ impl Visualize {
                             .map(|x| (x.x / width, (x.y / height)).into())
                             .collect()
                     })
-                    .skip(self.individual_start)
-                    .take(self.individual_end.abs_diff(self.individual_start) + 1)
+                    .skip(self.starting_point)
+                    .take(self.ending_point.abs_diff(self.starting_point) + 1)
                     .collect();
             }
             None => {}
@@ -179,18 +179,83 @@ impl Visualize {
         }
 
         //przeszkody
-        for obstacle in &self.enviroment.dynamic_obstacles {
-            let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| p.to_pos2()).collect();
-            object.push(object.first().unwrap().clone());
-            let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();
-            shapes.push(egui::Shape::circle_filled(
-                obstacle.position.to_pos2(),
-                0.05,
-                Color32::from_rgb(255, 255, 255),
-            ));
-            shapes.push(egui::Shape::line(points, self.stroke_kurs));
-        }
+        // for obstacle in &self.enviroment.dynamic_obstacles {
+        //     let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| p.to_pos2()).collect();
+        //     object.push(object.first().unwrap().clone());
+        //     let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();
+        //     shapes.push(egui::Shape::circle_filled(
+        //         obstacle.position.to_pos2(),
+        //         0.05,
+        //         Color32::from_rgb(255, 255, 255),
+        //     ));
+        //     shapes.push(egui::Shape::line(points, self.stroke_kurs));
+        // }
+        ////
+        shapes.push(egui::Shape::circle_filled(
+            to_screen * self.enviroment.starting_point.to_pos2(),
+            3.0,
+            Color32::from_rgb(0, 255, 255),
+        ));
+        shapes.push(egui::Shape::circle_filled(
+            to_screen * self.enviroment.ending_point.to_pos2(),
+            3.0,
+            Color32::from_rgb(255, 0, 255),
+        ));
+        shapes.push(egui::Shape::text(
+            &ui.fonts(),
+            to_screen
+                * ((vec2(
+                    self.enviroment.starting_point.x + 0.01,
+                    self.enviroment.starting_point.y,
+                ))
+                .to_pos2()),
+            Align2::LEFT_TOP,
+            format!(
+                "P. Poczatkowy\nX:{:.3} Y:{:.3}",
+                self.enviroment.starting_point.x, self.enviroment.starting_point.y
+            ),
+            FontId::new(12., FontFamily::Monospace),
+            Color32::from_rgb(0, 255, 255),
+        ));
 
+        shapes.push(egui::Shape::text(
+            &ui.fonts(),
+            to_screen
+                * ((vec2(
+                    self.enviroment.ending_point.x + 0.01,
+                    self.enviroment.ending_point.y,
+                ))
+                .to_pos2()),
+            Align2::LEFT_TOP,
+            format!(
+                "P. Koncowy\nX:{:.3} Y:{:.3}",
+                self.enviroment.ending_point.x, self.enviroment.ending_point.y
+            ),
+            FontId::new(12., FontFamily::Monospace),
+            Color32::from_rgb(255, 0, 255),
+        ));
+for obstacle in &self.enviroment.dynamic_obstacles {
+    let mut object: Vec<Pos2> = obstacle.safe_sphere.iter().map(|p| p.to_pos2()).collect();
+    object.push(object.first().unwrap().clone());
+    let points: Vec<Pos2> = object.iter().map(|p| to_screen * *p).collect();
+    shapes.push(egui::Shape::circle_filled(
+        to_screen * obstacle.position.to_pos2(),
+        1.0,
+        Color32::from_rgb(255, 255, 255),
+    ));
+    shapes.push(egui::Shape::text(
+        &ui.fonts(),
+        to_screen * ((vec2(obstacle.position.x, obstacle.position.y + 0.02)).to_pos2()),
+        Align2::CENTER_BOTTOM,
+        format!("X:{:.3} Y:{:.3}", obstacle.position.x, obstacle.position.y),
+        FontId::new(8., FontFamily::Monospace),
+        Color32::from_rgb(0, 255, 255),
+    ));
+
+    shapes.push(egui::Shape::line(points, self.stroke_kurs));
+}
+
+        /////
         painter.extend(shapes);
         response
     }
