@@ -13,27 +13,33 @@ pub mod painting;
 use self::podglad::Visualize;
 pub mod podglad;
 
+use self::dynamic_viev::Visualizedynamic;
+pub mod dynamic_viev;
+
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct EpnGui {
     // Example stuff:
-    label: String,
+    //label: String,
+    //#[serde(skip)]
+    //value: f32,
     #[serde(skip)]
     state: State,
     // this how you opt-out of serialization of a member
-    #[serde(skip)]
-    value: f32,
+   
     #[serde(skip)]
     painting: Painting,
     #[serde(skip)]
     visualize: Visualize,
+    #[serde(skip)]
+    visualizedynamic: Visualizedynamic,
 }
 
 pub struct State {
     //ustawienia_algorytmu: bool,
     rysowanie: bool,
     pokolenia: bool,
-    //tri: bool,
+    tri: bool,
     selected_anchor: String,
 }
 
@@ -45,13 +51,14 @@ impl Default for EpnGui {
                 //ustawienia_algorytmu: (true),
                 rysowanie: (true),
                 pokolenia: (false),
-                //tri: (false),
+                tri: (false),
                 selected_anchor: ("Rysowanie").to_string(),
             },
-            label: "Hello World!".to_owned(),
-            value: 2.7,
+            //label: "Hello World!".to_owned(),
+            //value: 2.7,
             painting: Painting::default(),
             visualize: Visualize::default(),
+            visualizedynamic:Visualizedynamic::default(),
         }
     }
 }
@@ -85,10 +92,12 @@ impl eframe::App for EpnGui {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         let Self {
             state,
-            label,
-            value,
+
+            //label,
+            //value,
             painting,
             visualize,
+            visualizedynamic,
         } = self;
         // The top panel is often a good place for a menu bar:
 
@@ -112,7 +121,7 @@ impl eframe::App for EpnGui {
                     for (name, anchor) in [
                         ("Rysowanie", &mut state.rysowanie),
                         ("wizualizacja", &mut state.pokolenia),
-                        //("tri", &mut state.tri),
+                        ("wizualizacja dynamiczna", &mut state.tri),
                     ] {
                         if ui.selectable_label(selected_anchor == name, name).clicked() {
                             selected_anchor = name.to_owned();
@@ -156,6 +165,10 @@ impl eframe::App for EpnGui {
         }
         if state.pokolenia {
             visualize.show(ctx);
+            
+        }
+        if state.tri {
+            visualizedynamic.show(ctx);
             
         }
 
