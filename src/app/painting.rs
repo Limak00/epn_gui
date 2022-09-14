@@ -96,12 +96,11 @@ impl Painting {
                 .write(true)
                 .create(true)
                 .truncate(true)
-                .open(self.file_name.to_owned()+".json")
+                .open(self.file_name.to_owned() + ".json")
                 .unwrap();
             let writer = BufWriter::new(enviroment_file);
             serde_json::to_writer(writer, &self.enviroment).unwrap();
         }
-
 
         ui.text_edit_singleline(&mut self.file_name);
         ui.separator();

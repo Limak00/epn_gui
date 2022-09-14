@@ -30,7 +30,7 @@ impl Default for Visualizedynamic {
             individual: 1,
             point: 1,
             pokolenie: 0,
-            percent_of_path:0,
+            percent_of_path: 0,
             statistics: vec![],
             enviroment: Enviroment::default(),
             srodowisko: Default::default(),
@@ -104,15 +104,16 @@ impl Visualizedynamic {
                 );
                 ui.label("punkt osobnika");
                 ui.add(
-                    egui::Slider::new(&mut self.point, 1..=self.statistics[self.pokolenie].population[self.individual].points.len())
-                        .text("punkt"),
+                    egui::Slider::new(
+                        &mut self.point,
+                        1..=self.statistics[self.pokolenie].population[self.individual]
+                            .points
+                            .len(),
+                    )
+                    .text("punkt"),
                 );
                 ui.label("procentowy progres");
-                ui.add(
-                    egui::Slider::new(&mut self.percent_of_path, 0..=100)
-                        .text("%"),
-                );
-
+                ui.add(egui::Slider::new(&mut self.percent_of_path, 0..=100).text("%"));
             }
             None => {}
         }
@@ -127,6 +128,8 @@ impl Visualizedynamic {
             response.rect,
         );
         // let from_screen = to_screen.inverse();
+
+        //TODO
 
         match self.statistics.first() {
             #[allow(unused)]
@@ -184,8 +187,6 @@ impl Visualizedynamic {
             }
         }
 
-        
-
         // pukty pocztkowe i koncowe
         shapes.push(egui::Shape::circle_filled(
             to_screen
@@ -240,7 +241,6 @@ impl Visualizedynamic {
             Color32::from_rgb(255, 0, 255),
         ));
 
-
         //dynamiczne przeszkody
 
         for obstacle in &self.enviroment.dynamic_obstacles {
@@ -285,7 +285,6 @@ impl Visualizedynamic {
             shapes.push(egui::Shape::line(points, self.stroke_kurs));
         }
 
-        
         painter.extend(shapes);
         response
     }

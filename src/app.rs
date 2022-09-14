@@ -1,10 +1,7 @@
-
 use std::f32::consts::PI;
 
-
-
-use egui::{Vec2, vec2};
-use serde::{Serialize, Deserialize};
+use egui::{vec2, Vec2};
+use serde::{Deserialize, Serialize};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 use self::painting::Painting;
@@ -26,7 +23,6 @@ pub struct EpnGui {
     #[serde(skip)]
     state: State,
     // this how you opt-out of serialization of a member
-   
     #[serde(skip)]
     painting: Painting,
     #[serde(skip)]
@@ -58,7 +54,7 @@ impl Default for EpnGui {
             //value: 2.7,
             painting: Painting::default(),
             visualize: Visualize::default(),
-            visualizedynamic:Visualizedynamic::default(),
+            visualizedynamic: Visualizedynamic::default(),
         }
     }
 }
@@ -78,7 +74,6 @@ impl EpnGui {
 
         Default::default()
     }
-
 }
 
 impl eframe::App for EpnGui {
@@ -127,8 +122,8 @@ impl eframe::App for EpnGui {
                             selected_anchor = name.to_owned();
                             *anchor = true;
                         }
-                        if selected_anchor !=name{
-                            *anchor=false;
+                        if selected_anchor != name {
+                            *anchor = false;
                         }
                     }
                     state.selected_anchor = selected_anchor;
@@ -142,37 +137,32 @@ impl eframe::App for EpnGui {
             });
         });
 
-      //  if state.ustawienia_algorytmu {
-      //      egui::SidePanel::left("ustawienia_algorytmu").show(ctx, |ui| {
-      //          ui.heading("Ustawienia_algorytmu");
-//
-      //          ui.horizontal(|ui| {
-      //              ui.label("Write something: ");
-      //              ui.text_edit_singleline(label);
-      //          });
-//
-      //          ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-      //          if ui.button("Increment").clicked() {
-      //              *value += 1.0;
-      //          }
-//
-      //      });
-      //  }
-//
+        //  if state.ustawienia_algorytmu {
+        //      egui::SidePanel::left("ustawienia_algorytmu").show(ctx, |ui| {
+        //          ui.heading("Ustawienia_algorytmu");
+        //
+        //          ui.horizontal(|ui| {
+        //              ui.label("Write something: ");
+        //              ui.text_edit_singleline(label);
+        //          });
+        //
+        //          ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
+        //          if ui.button("Increment").clicked() {
+        //              *value += 1.0;
+        //          }
+        //
+        //      });
+        //  }
+        //
         if state.rysowanie {
             painting.show(ctx);
-            
         }
         if state.pokolenia {
             visualize.show(ctx);
-            
         }
         if state.tri {
             visualizedynamic.show(ctx);
-            
         }
-
-
     }
 
     fn on_exit_event(&mut self) -> bool {
@@ -226,7 +216,6 @@ pub struct GenerationStatistic {
     pub mutation_operators_weights: Vec<f64>,
     pub mutation_operators_uses: Vec<usize>,
     pub crossover_operators_uses: usize,
-
 }
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct Enviroment {
@@ -236,57 +225,56 @@ pub struct Enviroment {
     pub ending_point: Vec2,
     pub static_obstacles: Vec<Vec<Vec2>>,
     pub dynamic_obstacles: Vec<DynaicObstacle>,
-
 }
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
-pub struct DynaicObstacle{
+pub struct DynaicObstacle {
     pub position: Vec2,
-    pub course :f32,
-    pub speed :f32,
+    pub course: f32,
+    pub speed: f32,
     pub safe_sphere: Vec<Vec2>,
-
 }
 
 impl DynaicObstacle {
-    pub fn new(position: Vec2, course:f32,speed:f32 ) -> Self{
-
-        
-        let mut safe_sphere=vec![];
-        let mut xx :f32;
-        let mut yy:f32;
-        let x=position.x*100.0;
-        let y=position.y*100.0;
-        let d:f32=2.0;
-        let co:f32 = course * PI / 180.0;
+    pub fn new(position: Vec2, course: f32, speed: f32) -> Self {
+        let mut safe_sphere = vec![];
+        let mut xx: f32;
+        let mut yy: f32;
+        let x = position.x * 100.0;
+        let y = position.y * 100.0;
+        let d: f32 = 2.0;
+        let co: f32 = course * PI / 180.0;
         safe_sphere.clear();
 
         xx = x + d * (-co).sin();
         yy = y + d * (co + PI).cos();
-        safe_sphere.push(vec2(xx,yy));
+        safe_sphere.push(vec2(xx, yy));
 
-        xx =x + d * (co + PI / 2.0).sin();
-        yy =y + d * (co + PI / 2.0).cos();
-        safe_sphere.push(vec2(xx,yy));
+        xx = x + d * (co + PI / 2.0).sin();
+        yy = y + d * (co + PI / 2.0).cos();
+        safe_sphere.push(vec2(xx, yy));
 
         xx = x + (4.47214) * (co + 26.565 * PI / 180.0).sin();
-        yy = y +(4.47214) * (co + 26.565 * PI / 180.0).cos();
-        safe_sphere.push(vec2(xx,yy));
+        yy = y + (4.47214) * (co + 26.565 * PI / 180.0).cos();
+        safe_sphere.push(vec2(xx, yy));
 
         xx = x + 3.0 * d * (co).sin();
         yy = y + 3.0 * d * (co).cos();
-        safe_sphere.push(vec2(xx,yy));
+        safe_sphere.push(vec2(xx, yy));
 
         xx = x + (5.65685) * (co + 315.0 * PI / 180.0).sin();
         yy = y + (5.65685) * (co + 315.0 * PI / 180.0).cos();
-        safe_sphere.push(vec2(xx,yy));
+        safe_sphere.push(vec2(xx, yy));
 
         xx = x + d * d * (co - PI / 2.0).sin();
         yy = y + d * d * (-co + PI / 2.0).cos();
-        safe_sphere.push(vec2(xx,yy));
+        safe_sphere.push(vec2(xx, yy));
 
-        safe_sphere=safe_sphere.iter().map(|x| vec2(x.x/100.0,x.y/100.0)).collect();
+        safe_sphere = safe_sphere
+            .iter()
+            .map(|x| vec2(x.x / 100.0, x.y / 100.0))
+            .collect();
 
-        Self{
+        Self {
             position,
             course,
             speed,
